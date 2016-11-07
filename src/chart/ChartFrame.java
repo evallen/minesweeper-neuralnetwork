@@ -13,6 +13,11 @@ import controller.Parameters;
 
 public class ChartFrame extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
 	public ChartFrame (String windowTitle) {
