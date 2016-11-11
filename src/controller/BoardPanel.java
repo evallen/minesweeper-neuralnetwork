@@ -3,14 +3,12 @@ package controller;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 
-public class BoardPanel extends JPanel implements MouseListener, KeyListener {
+public class BoardPanel extends JPanel implements MouseListener {
 	/**
 	 * 
 	 */
@@ -69,7 +67,7 @@ public class BoardPanel extends JPanel implements MouseListener, KeyListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		System.out.println("Click @ (" + e.getX() + ", " + e.getY() + ")");
+		//System.out.println("Click @ (" + e.getX() + ", " + e.getY() + ")");
 		this.requestFocus();
 		
 	}
@@ -85,32 +83,4 @@ public class BoardPanel extends JPanel implements MouseListener, KeyListener {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		System.out.println("Key released!");
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		System.out.println("Key released!");
-		if (e.getKeyCode() == KeyEvent.VK_J) {
-			//Controller.rate++;
-		}
-		
-		if (e.getKeyCode() == KeyEvent.VK_K) {
-			//Controller.rate--;
-		}
-		
-		//Controller.rate = Math.max(1.0, Controller.rate);
-	}
-	
-	
 }

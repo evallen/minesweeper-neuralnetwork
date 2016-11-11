@@ -20,14 +20,14 @@ public class Parameters {
 	public static final int PANEL_PREFERRED_HEIGHT = BOARD_HEIGHT + (2 * BORDER_PADDING);
 	
 	// Genetic algorithm stuff
-	public final static int POPULATION_SIZE =70; // how many genomes are in the population
-	public final static int NUM_ELITISM = 8;
-	public final static int GENERATION_TIME = 1200; // length of generation in ticks
-	public static double MUTATION_RATE = 0.1;
-	public static double CROSSOVER_RATE = 0.7;
-	public final static double MUTATION_MULTIPLIER = .5; // how big the mutation can be - value of 1.0 symbolizes that weight can move max of 1.0 either direction
-	public final static int NUM_WEIGHTS_PER_GENOME = (11 * 15) + (16 * 2);
-	public final static double ROULETTE_MODIFIER = 2.0; // how much the top fitnesses are valued over lower ones.
+	//public final static int POPULATION_SIZE =70; // how many genomes are in the population
+	//public final static int NUM_ELITISM = 8;
+	//public final static int GENERATION_TIME = 1200; // length of generation in ticks
+	//public static double MUTATION_RATE = 0.1;
+	//public static double CROSSOVER_RATE = 0.7;
+	//public final static double MUTATION_MULTIPLIER = .5; // how big the mutation can be - value of 1.0 symbolizes that weight can move max of 1.0 either direction
+	//public final static int NUM_WEIGHTS_PER_GENOME = (11 * 15) + (16 * 2);
+	//public final static double ROULETTE_MODIFIER = 2.0; // how much the top fitnesses are valued over lower ones.
 	
 	// Neural network stuff
 	public final static int NUM_HIDDEN_LAYERS = 2;

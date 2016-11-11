@@ -1,5 +1,6 @@
 package genalgorithm;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -8,6 +9,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import controller.Controller;
 import controller.MineSweeper;
@@ -25,10 +33,54 @@ public class GeneticAlgorithm {
 	public List<Double> worstFitnesses = new ArrayList<Double>();
 	public List<Double> avgFitnesses = new ArrayList<Double>();
 	
+	public int populationSize; // how many genomes are in the population
+	public int numElitism;
+	public int generationTime; // length of generation in ticks
+	public double mutationRate;
+	public double crossoverRate;
+	public double mutationMultiplier; // how big the mutation can be - value of 1.0 symbolizes that weight can move max of 1.0 either direction
+	public int numWeightsPerGenome;
+	public double rouletteModifier; // how much the top fitnesses are valued over lower ones.
+	
 	List<Genome> genomes = new ArrayList<Genome>();
 	
-	public GeneticAlgorithm () {
-		// default ctor
+	public GeneticAlgorithm (File XMLFile) {
+		parseXML(XMLFile);
+	}
+	
+	private void parseXML(File XMLFile) {
+		try {
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			SAXParser parser = factory.newSAXParser();
+			
+			DefaultHandler handler = new DefaultHandler() {				
+				public void startElement(String uri, String localName,String qName, Attributes attributes) throws SAXException {
+					if (qName.equals("geneticAlgorithm")) {
+						populationSize = Integer.valueOf(attributes.getValue("populationSize"));
+						numElitism = Integer.valueOf(attributes.getValue("numElitism"));
+						generationTime = Integer.valueOf(attributes.getValue("generationTime"));
+						mutationRate = Double.valueOf(attributes.getValue("mutationRate"));
+						crossoverRate = Double.valueOf(attributes.getValue("crossoverRate"));
+						mutationMultiplier = Double.valueOf(attributes.getValue("mutationMultiplier"));
+						numWeightsPerGenome = Integer.valueOf(attributes.getValue("numWeightsPerGenome"));
+						rouletteModifier = Double.valueOf(attributes.getValue("rouletteModifier"));						
+					}
+				}
+				
+				public void endElement(String uri, String localName, String qName) throws SAXException {
+					// nothing
+				}
+				
+				public void characters(char ch[], int start, int length) throws SAXException {
+					// nothing
+				}
+			};
+			
+			parser.parse(XMLFile, handler);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void start() {
@@ -42,20 +94,20 @@ public class GeneticAlgorithm {
 	private void generateRandomGenomes() {
 		Random rand = new Random();
 		
-		for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
+		for (int i = 0; i < populationSize; i++) {
 			List<Double> randomWeights = new ArrayList<Double>();
-			for (int j = 0; j < Parameters.NUM_WEIGHTS_PER_GENOME; j++) {
+			for (int j = 0; j < numWeightsPerGenome; j++) {
 				randomWeights.add((rand.nextDouble() * 2) - 1);
 			}
 			genomes.add(new Genome(randomWeights));
 		}
 	}
 	
-	public static Genome[] crossover(Genome mom, Genome dad) {
+	public Genome[] crossover(Genome mom, Genome dad) {
 		Genome[] children = new Genome[2];
 		Random rand = new Random();
 		
-		if (rand.nextDouble() > Parameters.CROSSOVER_RATE || mom.weights == dad.weights) {
+		if (rand.nextDouble() > crossoverRate || mom.weights == dad.weights) {
 			children[0] = mom;
 			children[1] = dad;
 			return children;
@@ -77,13 +129,13 @@ public class GeneticAlgorithm {
 		return children;
 	}
 	
-	public static void mutate(Genome genome) {
+	public void mutate(Genome genome) {
 		Random rand = new Random();
 		
 		List<Double> newWeights = new ArrayList<Double>();
 		for (Double weight : genome.weights) {
-			if (rand.nextDouble() < Parameters.MUTATION_RATE) {
-				newWeights.add(weight + (rand.nextDouble() * 2 * Parameters.MUTATION_MULTIPLIER) - Parameters.MUTATION_MULTIPLIER); // changes by random value between -1.0 and 1.0
+			if (rand.nextDouble() < mutationRate) {
+				newWeights.add(weight + (rand.nextDouble() * 2 * mutationMultiplier) - mutationMultiplier); // changes by random value between -1.0 and 1.0
 				
 			} else {
 				newWeights.add(weight);
@@ -115,24 +167,24 @@ public class GeneticAlgorithm {
 		
 		// elitism - we keep a few of the best genomes
 		List<Genome> newPop = new ArrayList<Genome>();
-		for (int i = 0; i < Parameters.NUM_ELITISM; i++) {
+		for (int i = 0; i < numElitism; i++) {
 			newPop.add(genomes.get(i));
 		}
 		
 		// crossover
-		while (newPop.size() < Parameters.POPULATION_SIZE) {
+		while (newPop.size() < populationSize) {
 			Genome[] newGenomes = crossover(genomes.get(selectGenomeRoulette(genomes)), genomes.get(selectGenomeRoulette(genomes)));
 			
 			//mutate
-			GeneticAlgorithm.mutate(newGenomes[0]);
-			GeneticAlgorithm.mutate(newGenomes[1]);
+			mutate(newGenomes[0]);
+			mutate(newGenomes[1]);
 			
 			newPop.add(newGenomes[0]);
 			newPop.add(newGenomes[1]);
 		}
 		
 		// take out extra genome if one was added during crossover (since each crossover gives two but the population size or elitism size may have been odd)
-		if (newPop.size() == Parameters.POPULATION_SIZE) {
+		if (newPop.size() == populationSize) {
 			//newPop.remove(newPop.size() - 1);
 		}
 		
@@ -148,7 +200,7 @@ public class GeneticAlgorithm {
 		}
 		cumulativeWheel[0] = genomes.get(0).fitness - worstFitness;
 		for (int i = 1; i < cumulativeWheel.length; i++) {
-			cumulativeWheel[i] = cumulativeWheel[i-1] + Math.pow(genomes.get(i).fitness - worstFitness, Parameters.ROULETTE_MODIFIER);
+			cumulativeWheel[i] = cumulativeWheel[i-1] + Math.pow(genomes.get(i).fitness - worstFitness, rouletteModifier);
 		}
 		
 		Random rng = new Random();
@@ -174,7 +226,7 @@ public class GeneticAlgorithm {
 		
 		Random rand = new Random();
 				
-		for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
+		for (int i = 0; i < populationSize; i++) {
 			int x = rand.nextInt(Parameters.BOARD_WIDTH) + Parameters.BORDER_PADDING;
 			int y = rand.nextInt(Parameters.BOARD_HEIGHT) + Parameters.BORDER_PADDING;
 			int heading = rand.nextInt(360); 
@@ -189,7 +241,7 @@ public class GeneticAlgorithm {
 	}
 	
 	private void setGenomeFitnesses() {
-		for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
+		for (int i = 0; i < populationSize; i++) {
 			genomes.get(i).fitness = Controller.sweepers[i].score;
 		}
 	}

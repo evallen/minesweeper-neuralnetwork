@@ -2,6 +2,7 @@ package controller;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Random;
 
 import javax.swing.AbstractAction;
@@ -13,7 +14,10 @@ import genalgorithm.GeneticAlgorithm;
 
 public class Controller {
 	
-	public static MineSweeper[] sweepers = new MineSweeper[Parameters.POPULATION_SIZE];
+	public static File XMLFile = new File("controller\\params.xml");
+	static GeneticAlgorithm ga = new GeneticAlgorithm(XMLFile);
+		
+	public static MineSweeper[] sweepers = new MineSweeper[ga.populationSize];
 	public static Mine[] mines = new Mine[Parameters.NUM_MINES];
 	
 	private static double lastUpdateTime = 0; // in milliseconds
@@ -27,8 +31,6 @@ public class Controller {
 	
 	static int totalTicks = 0;
 	static int epochTicks = 0;
-	
-	static GeneticAlgorithm ga;
 	
 	public static ChartFrame cFrame;
 	
@@ -131,7 +133,6 @@ public class Controller {
 		
 		panel.requestFocus();
 		
-		ga = new GeneticAlgorithm();
 		ga.start();
 		
 	}
@@ -160,7 +161,7 @@ public class Controller {
 			totalTicks++;
 			epochTicks++;
 			
-			if (epochTicks >= Parameters.GENERATION_TIME) {
+			if (epochTicks >= ga.generationTime) {
 				return;
 			}
 		}

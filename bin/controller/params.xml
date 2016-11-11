@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<parameters>
+	<jFrame width="1000" height="800" numMines="200"></jFrame>
+	<boardPanel borderPadding="20" boardWidth="1000" boardHeight="800"></boardPanel>
+	<geneticAlgorithm populationSize="70" numElitism="8" generationTime="1200" mutationRate="0.1" 
+		crossoverRate="0.7" mutationMultiplier=".5" numWeightsPerGenome="197" rouletteModifier="2.0"></geneticAlgorithm>
+	<neuralNetwork numHiddenLayers="2" numInputs="10" numOutputs="2">
+		<numNeuronsPerHiddenLayer>
+			<layer numNeurons="15"></layer>
+			<layer numNeurons="2"></layer>
+		</numNeuronsPerHiddenLayer>
+	</neuralNetwork>
+	<mineSweeper minSpeed="6.0" numMinesVisible="5"></mineSweeper>
+	<chart chartPanelWidth="700" chartPanelHeight="500"></chart>
+	<logging fittestGenomeLogFile="logs\fittest_genomes.txt"></logging>
+	<mines>
+		<mineType score="-1.0" probability=".85" color="0x0000ff"></mineType>
+		<mineType score="4.0" probability=".15" color="0xff0000"></mineType>
+	</mines>
+</parameters>
