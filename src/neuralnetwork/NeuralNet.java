@@ -32,8 +32,7 @@ public class NeuralNet {
 	 * @param numInputs The number of inputs to the net.
 	 * @param numOutputs The number of outputs the net will produce.
 	 * @param numHiddenLayers The number of hidden layers in the net. This includes the output layer but does not include the input layer.
-	 * @param numNeuronsPerHiddenLayer The number of neurons per each hidden layer. 
-	 * @param layerWeights A structure to hold the weights of the neural net. Is a List containing multiple Lists (each representing a layer), each of which contains another List (each representing a neuron's weights).
+	 * @param numNeuronsPerHiddenLayer The number of neurons per each hidden layer.
 	 */
 	public NeuralNet(int numInputs, int numOutputs, int numHiddenLayers, int numNeuronsPerHiddenLayer[], List<Double> weights) {
 		this.numInputs = numInputs;
@@ -44,7 +43,7 @@ public class NeuralNet {
 		makeNet(weights);
 	}
 	
-	public void makeNet() {
+	public void makeNet() { // TODO Add logic for dedicated output layer (instead of using a final "hidden" one)
 		layers.add(new NeuronLayer(numNeuronsPerHiddenLayer[0], numInputs));
 		for (int i = 1; i < numHiddenLayers; i++) {
 			layers.add(new NeuronLayer(numNeuronsPerHiddenLayer[i], numNeuronsPerHiddenLayer[i-1]));

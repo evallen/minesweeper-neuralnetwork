@@ -1,5 +1,7 @@
 package controller;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,10 +15,10 @@ public class Mine {
 	final int sideLength = 5;
 	private int scoreIndex;
 	
-	public Mine (int x, int y) throws Exception {
+	public Mine (int x, int y) throws IllegalArgumentException {
 		if (x < Parameters.BORDER_PADDING || x >= Parameters.BORDER_PADDING + Parameters.BOARD_WIDTH
 				|| y < Parameters.BORDER_PADDING || y >= Parameters.BORDER_PADDING + Parameters.BOARD_HEIGHT) {
-			throw new Exception("Initial coordinates of mine are out of bounds! ( " + x + ", " + y + ")");
+			throw new IllegalArgumentException("Initial coordinates of mine are out of bounds! ( " + x + ", " + y + ")");
 		}
 		
 		this.x = x; 
@@ -24,7 +26,7 @@ public class Mine {
 		this.scoreIndex = getRandomScoreIndex();
 	}
 	
-	public void paintMine (Graphics g) {
+	public void paintMine (@NotNull Graphics g) {
 		Graphics2D g2d = (Graphics2D) g.create();
 		
 		Color color = getScoreColor();

@@ -14,7 +14,7 @@ import genalgorithm.GeneticAlgorithm;
 
 public class Controller {
 	
-	public static File XMLFile = new File("controller\\params.xml");
+	public static File XMLFile = new File("src\\controller\\params.xml");
 	static GeneticAlgorithm ga = new GeneticAlgorithm(XMLFile);
 		
 	public static MineSweeper[] sweepers = new MineSweeper[ga.populationSize];
@@ -224,7 +224,7 @@ public class Controller {
 			int y = rand.nextInt(Parameters.BOARD_HEIGHT) + Parameters.BORDER_PADDING;
 			try {
 				mines[i] = new Mine(x, y);
-			} catch (Exception e) {
+			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}
 		}

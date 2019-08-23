@@ -56,14 +56,14 @@ public class GeneticAlgorithm {
 			DefaultHandler handler = new DefaultHandler() {				
 				public void startElement(String uri, String localName,String qName, Attributes attributes) throws SAXException {
 					if (qName.equals("geneticAlgorithm")) {
-						populationSize = Integer.valueOf(attributes.getValue("populationSize"));
-						numElitism = Integer.valueOf(attributes.getValue("numElitism"));
-						generationTime = Integer.valueOf(attributes.getValue("generationTime"));
-						mutationRate = Double.valueOf(attributes.getValue("mutationRate"));
-						crossoverRate = Double.valueOf(attributes.getValue("crossoverRate"));
-						mutationMultiplier = Double.valueOf(attributes.getValue("mutationMultiplier"));
-						numWeightsPerGenome = Integer.valueOf(attributes.getValue("numWeightsPerGenome"));
-						rouletteModifier = Double.valueOf(attributes.getValue("rouletteModifier"));						
+						populationSize = Integer.parseInt(attributes.getValue("populationSize"));
+						numElitism = Integer.parseInt(attributes.getValue("numElitism"));
+						generationTime = Integer.parseInt(attributes.getValue("generationTime"));
+						mutationRate = Double.parseDouble(attributes.getValue("mutationRate"));
+						crossoverRate = Double.parseDouble(attributes.getValue("crossoverRate"));
+						mutationMultiplier = Double.parseDouble(attributes.getValue("mutationMultiplier"));
+						numWeightsPerGenome = Integer.parseInt(attributes.getValue("numWeightsPerGenome"));
+						rouletteModifier = Double.parseDouble(attributes.getValue("rouletteModifier"));
 					}
 				}
 				
@@ -167,7 +167,7 @@ public class GeneticAlgorithm {
 		
 		// elitism - we keep a few of the best genomes
 		List<Genome> newPop = new ArrayList<Genome>();
-		for (int i = 0; i < numElitism; i++) {
+		for (int i = 0; i < numElitism && i < populationSize; i++) {
 			newPop.add(genomes.get(i));
 		}
 		
