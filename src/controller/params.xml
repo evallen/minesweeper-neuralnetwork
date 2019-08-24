@@ -1,41 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <parameters>
 
-	<jFrame width="1000"
-			height="600"
-			numMines="200"/>
+    <jFrame width="1000"
+            height="600"/>
 
-	<boardPanel borderPadding="20"
-				boardWidth="1000"
-				boardHeight="600"/>
+    <!-- Combine boardPanel w/ jFrame properties? -->
+    <boardPanel borderPadding="20"
+                boardWidth="1000"
+                boardHeight="600"/>
 
-	<geneticAlgorithm populationSize="70" numElitism="8"
-					  generationTime="1200" mutationRate="0.1"
-					  crossoverRate="0.7" mutationMultiplier=".5"
-					  numWeightsPerGenome="197" rouletteModifier="2.0"/>
+    <geneticAlgorithm populationSize="70" numElitism="8"
+                      generationTime="1200" mutationRate="0.1"
+                      crossoverRate="0.7" mutationMultiplier=".5"
+                      numWeightsPerGenome="197" rouletteModifier="2.0"/>
 
-	<neuralNetwork numHiddenLayers="2"
-				   numInputs="10"
-				   numOutputs="2">
+    <neuralNetwork numInputs="10"
+                   numOutputs="2"/>
+    <hiddenLayer numNeurons="15"/>
+    <hiddenLayer numNeurons="2"/>
 
-		<numNeuronsPerHiddenLayer>
-			<layer numNeurons="15"/>
-			<layer numNeurons="2"/>
-		</numNeuronsPerHiddenLayer>
+    <mineSweeper minSpeed="6.0"
+                 numMinesVisible="5"/>
 
-	</neuralNetwork>
+    <chart chartPanelWidth="700"
+           chartPanelHeight="500"/>
 
-	<mineSweeper minSpeed="6.0"
-				 numMinesVisible="5"/>
+    <!-- Make sure to escape literal backslashes! (ex. '\' -> '\\') -->
+    <logging fittestGenomeLogFile="logs\\fittest_genomes.txt"/>
 
-	<chart chartPanelWidth="700"
-		   chartPanelHeight="500"/>
-
-	<logging fittestGenomeLogFile="logs\fittest_genomes.txt"/>
-
-	<mines>
-		<mineType score="-1.0" probability="0" color="0x0000ff"/>
-		<mineType score="4.0" probability="1" color="0xff0000"/>
-	</mines>
+    <mines numMines="100"/>
+    <mineType score="-1.0" probability="0" color="0000ff"/>
+    <mineType score="4.0" probability="1" color="ff0000"/>
 
 </parameters>
