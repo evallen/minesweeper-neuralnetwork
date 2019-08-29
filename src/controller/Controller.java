@@ -13,32 +13,28 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import chart.ChartFrame;
 import genalgorithm.GeneticAlgorithm;
+import neuralnetwork.IllegalParameterException;
 import org.xml.sax.SAXException;
 
 public class Controller
 {
 
-    public static File XMLFile = new File("src\\controller\\params.xml");
+    private static File XMLFile = new File("src\\controller\\params.xml");
     static GeneticAlgorithm ga = new GeneticAlgorithm();
 
     public static MineSweeper[] sweepers;
-    public static Mine[] mines;
+    static Mine[] mines;
 
-    private static double lastUpdateTime = 0; // in milliseconds
     private static double deltaTime = 0; // in seconds
 
-    static double ticksPerSecond = 60;
-    static double msBetweenTicks = (1 / ticksPerSecond) * 1000;
-    static double tickMultiplier = 1.0;
+    private static BoardPanel panel;
 
-    static BoardPanel panel;
-
-    static int totalTicks = 0;
-    static int epochTicks = 0;
+    private static int totalTicks = 0;
+    private static int epochTicks = 0;
 
     public static ChartFrame cFrame;
 
-    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException
+    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException, IllegalParameterException
     {
 
         Parameters.initializeParameters(XMLFile);
@@ -70,8 +66,8 @@ public class Controller
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                tickMultiplier -= 20;
-                tickMultiplier = Math.max(1.0, tickMultiplier);
+                Parameters.TICK_MULTIPLIER -= 20;
+                Parameters.TICK_MULTIPLIER = Math.max(1.0, Parameters.TICK_MULTIPLIER);
             }
 
         });
@@ -86,7 +82,7 @@ public class Controller
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                tickMultiplier += 20;
+                Parameters.TICK_MULTIPLIER += 20;
 
             }
 
@@ -102,8 +98,8 @@ public class Controller
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                tickMultiplier -= 0.1;
-                tickMultiplier = Math.max(tickMultiplier, 0.1);
+                Parameters.TICK_MULTIPLIER -= 0.1;
+                Parameters.TICK_MULTIPLIER = Math.max(Parameters.TICK_MULTIPLIER, 0.1);
             }
 
         });
@@ -118,7 +114,7 @@ public class Controller
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                tickMultiplier += 0.1;
+                Parameters.TICK_MULTIPLIER += 0.1;
             }
         });
         panel.getActionMap().put("paintToggle", new AbstractAction()
@@ -132,7 +128,7 @@ public class Controller
             @Override
             public void actionPerformed(ActionEvent e)
             {
-				panel.painting = !panel.painting;
+                panel.painting = !panel.painting;
             }
         });
         BorderLayout layout = new BorderLayout();
@@ -161,18 +157,21 @@ public class Controller
         clearAndCreateMines(rand);
         runGameLoop();
 
-        for (MineSweeper sweeper : sweepers) {
+        for (MineSweeper sweeper : sweepers)
+        {
             sweeper.epochEnd();
         }
     }
 
-    public static void runGameLoop()
+    private static void runGameLoop()
     {
-        lastUpdateTime = System.currentTimeMillis();
-        while (true) {
+        // in milliseconds
+        double lastUpdateTime = System.currentTimeMillis();
+        while (true)
+        {
             deltaTime = System.currentTimeMillis() - lastUpdateTime;
 
-            if (deltaTime < msBetweenTicks / tickMultiplier)
+            if (deltaTime < Parameters.MS_BETWEEN_TICKS / Parameters.TICK_MULTIPLIER)
                 continue;
 
             lastUpdateTime = System.currentTimeMillis();
@@ -180,76 +179,88 @@ public class Controller
             totalTicks++;
             epochTicks++;
 
-            if (epochTicks >= Parameters.GENERATION_TIME) {
+            if (epochTicks >= Parameters.GENERATION_TIME)
+            {
                 return;
             }
         }
     }
 
-    public static void tick()
+    private static void tick()
     {
-        for (MineSweeper sweeper : sweepers) {
+        for (MineSweeper sweeper : sweepers)
+        {
             sweeper.doTurn();
         }
         checkMineCollisions();
-        if (panel.painting) {
+        if (panel.painting)
+        {
             panel.repaint();
         }
     }
 
     public static double getDeltaTimeSec()
     {
-        return (deltaTime * tickMultiplier) / 1000;
+        return (deltaTime * Parameters.TICK_MULTIPLIER) / 1000;
     }
 
     public static double getDeltaTimeMs()
     {
-        return deltaTime * tickMultiplier;
+        return deltaTime * Parameters.TICK_MULTIPLIER;
     }
 
     /**
      * Checks to see if any mine sweepers have hit a mine - if they have, increment the minesweeper's
      * mine counter, delete the mine, and put a new one somewhere.
      */
-    public static void checkMineCollisions()
+    private static void checkMineCollisions()
     {
-        for (int i = 0; i < mines.length; i++) {
+        for (int i = 0; i < mines.length; i++)
+        {
             MineSweeper closestSweeper = null;
             double closestDistance = Double.POSITIVE_INFINITY;
-            for (int j = 0; j < sweepers.length; j++) {
-                double distance = getDistance(sweepers[j].x, sweepers[j].y, mines[i].x, mines[i].y);
-                if (distance <= MineSweeper.collectDistance && distance < closestDistance) {
+            for (MineSweeper sweeper : sweepers)
+            {
+                double distance = getDistance(sweeper.x, sweeper.y, mines[i].x, mines[i].y);
+                if (distance <= MineSweeper.collectDistance && distance < closestDistance)
+                {
                     closestDistance = distance;
-                    closestSweeper = sweepers[j];
+                    closestSweeper = sweeper;
                 }
             }
-            if (closestSweeper != null) {
+            if (closestSweeper != null)
+            {
                 closestSweeper.collectedMine(mines[i]);
                 Random rand = new Random();
                 int x = rand.nextInt(Parameters.WIDTH) + Parameters.BORDER_PADDING;
                 int y = rand.nextInt(Parameters.HEIGHT) + Parameters.BORDER_PADDING;
-                try {
+                try
+                {
                     mines[i] = new Mine(x, y);
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     e.printStackTrace();
                 }
             }
         }
     }
 
-    public static double getDistance(double x1, double y1, double x2, double y2)
+    static double getDistance(double x1, double y1, double x2, double y2)
     {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
-    public static void clearAndCreateMines(Random rand)
+    private static void clearAndCreateMines(Random rand)
     {
-        for (int i = 0; i < mines.length; i++) {
+        for (int i = 0; i < mines.length; i++)
+        {
             int x = rand.nextInt(Parameters.WIDTH) + Parameters.BORDER_PADDING;
             int y = rand.nextInt(Parameters.HEIGHT) + Parameters.BORDER_PADDING;
-            try {
+            try
+            {
                 mines[i] = new Mine(x, y);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e)
+            {
                 e.printStackTrace();
             }
         }

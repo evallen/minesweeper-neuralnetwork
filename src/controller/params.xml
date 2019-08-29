@@ -9,18 +9,29 @@
                 boardWidth="1000"
                 boardHeight="600"/>
 
-    <geneticAlgorithm populationSize="70" numElitism="8"
-                      generationTime="1200" mutationRate="0.1"
-                      crossoverRate="0.7" mutationMultiplier=".5"
+    <geneticAlgorithm populationSize="40" numElitism="8"
+                      generationTime="1200" mutationRate="0.2"
+                      crossoverRate="0.7" mutationMultiplier="1.0"
                       numWeightsPerGenome="197" rouletteModifier="2.0"/>
 
-    <neuralNetwork numInputs="10"
-                   numOutputs="2"/>
-    <hiddenLayer numNeurons="15"/>
-    <hiddenLayer numNeurons="2"/>
+    <ticks ticksPerSecond="60"
+           tickMultiplier="1.0"/>
 
-    <mineSweeper minSpeed="6.0"
-                 numMinesVisible="5"/>
+    <neuralNetwork numInputs="15"/>
+    <layer numNeurons="40" activationType="relu"/>
+    <layer numNeurons="2" activationType="sigmoid"/>
+    <!-- This final "layer" is actually the output. It's written like this so we can use the same
+         framework to describe the output layer (`numNeurons`, `activationType`, etc.) as we do to describe
+         the hidden layers. -->
+
+    <mineSweeper minSpeed="0.0"
+                 numMinesVisible="5"
+                 bodyLength="14"
+                 bodyWidth="5"
+                 wheelLength="8"
+                 wheelWidth="4"
+                 steeringMultiplier="4"
+                 maxTurnSpeed="80"/>
 
     <chart chartPanelWidth="700"
            chartPanelHeight="500"/>
@@ -28,8 +39,8 @@
     <!-- Make sure to escape literal backslashes! (ex. '\' -> '\\') -->
     <logging fittestGenomeLogFile="logs\\fittest_genomes.txt"/>
 
-    <mines numMines="100"/>
+    <mines numMines="200"/>
     <mineType score="-1.0" probability="0" color="0000ff"/>
-    <mineType score="4.0" probability="1" color="ff0000"/>
+    <mineType score="10.0" probability="1.0" color="ff0000"/>
 
 </parameters>

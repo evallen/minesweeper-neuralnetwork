@@ -1,32 +1,20 @@
 package genalgorithm;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
 import controller.Controller;
 import controller.MineSweeper;
 import controller.Parameters;
+import neuralnetwork.IllegalParameterException;
 import neuralnetwork.NeuralNet;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.*;
 
 public class GeneticAlgorithm
 {
 
-    public Genome fittestGenome = new Genome(null);
+    private Genome fittestGenome = new Genome(null);
 
     public int generations = 0;
 
@@ -35,12 +23,13 @@ public class GeneticAlgorithm
     public List<Double> worstFitnesses = new ArrayList<Double>();
     public List<Double> avgFitnesses = new ArrayList<Double>();
 
-    List<Genome> genomes = new ArrayList<Genome>();
+    private List<Genome> genomes = new ArrayList<Genome>();
 
-    public void start()
+    public void start() throws IllegalParameterException
     {
         generateRandomGenomes();
-        while (true) {
+        while (true)
+        {
             generations++;
             runEpoch();
         }
@@ -50,21 +39,24 @@ public class GeneticAlgorithm
     {
         Random rand = new Random();
 
-        for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
+        for (int i = 0; i < Parameters.POPULATION_SIZE; i++)
+        {
             List<Double> randomWeights = new ArrayList<Double>();
-            for (int j = 0; j < Parameters.NUM_WEIGHTS_PER_GENOME; j++) {
+            for (int j = 0; j < Parameters.NUM_WEIGHTS_PER_GENOME; j++)
+            {
                 randomWeights.add((rand.nextDouble() * 2) - 1);
             }
             genomes.add(new Genome(randomWeights));
         }
     }
 
-    public Genome[] crossover(Genome mom, Genome dad)
+    private Genome[] crossover(Genome mom, Genome dad)
     {
         Genome[] children = new Genome[2];
         Random rand = new Random();
 
-        if (rand.nextDouble() > Parameters.CROSSOVER_RATE || mom.weights == dad.weights) {
+        if (rand.nextDouble() > Parameters.CROSSOVER_RATE || mom.weights == dad.weights)
+        {
             children[0] = mom;
             children[1] = dad;
             return children;
@@ -86,16 +78,20 @@ public class GeneticAlgorithm
         return children;
     }
 
-    public void mutate(Genome genome)
+    private void mutate(Genome genome)
     {
         Random rand = new Random();
 
         List<Double> newWeights = new ArrayList<Double>();
-        for (Double weight : genome.weights) {
-            if (rand.nextDouble() < Parameters.MUTATION_RATE) {
+        for (Double weight : genome.weights)
+        {
+            if (rand.nextDouble() < Parameters.MUTATION_RATE)
+            {
                 newWeights.add(weight + (rand.nextDouble() * 2 * Parameters.MUTATION_MULTIPLIER) - Parameters.MUTATION_MULTIPLIER); // changes by random value between -1.0 and 1.0
 
-            } else {
+            }
+            else
+            {
                 newWeights.add(weight);
             }
         }
@@ -103,7 +99,7 @@ public class GeneticAlgorithm
         genome.weights = newWeights;
     }
 
-    private void runEpoch()
+    private void runEpoch() throws IllegalParameterException
     {
         // create MineSweepers
         createMineSweepers();
@@ -126,12 +122,14 @@ public class GeneticAlgorithm
 
         // elitism - we keep a few of the best genomes
         List<Genome> newPop = new ArrayList<Genome>();
-        for (int i = 0; i < Parameters.NUM_ELITISM && i < Parameters.POPULATION_SIZE; i++) {
+        for (int i = 0; i < Parameters.NUM_ELITISM && i < Parameters.POPULATION_SIZE; i++)
+        {
             newPop.add(genomes.get(i));
         }
 
         // crossover
-        while (newPop.size() < Parameters.POPULATION_SIZE) {
+        while (newPop.size() < Parameters.POPULATION_SIZE)
+        {
             Genome[] newGenomes = crossover(genomes.get(selectGenomeRoulette(genomes)), genomes.get(selectGenomeRoulette(genomes)));
 
             //mutate
@@ -143,7 +141,8 @@ public class GeneticAlgorithm
         }
 
         // take out extra genome if one was added during crossover (since each crossover gives two but the population size or elitism size may have been odd)
-        if (newPop.size() == Parameters.POPULATION_SIZE) {
+        if (newPop.size() == Parameters.POPULATION_SIZE)
+        {
             //newPop.remove(newPop.size() - 1);
         }
 
@@ -155,11 +154,13 @@ public class GeneticAlgorithm
         // genomes list must be sorted by this point!
         double[] cumulativeWheel = new double[gList.size()];
         double worstFitness = genomes.get(genomes.size() - 1).fitness; // Used for when we have negative fitness values - we just recenter all of them so the worst is at 0 so we can use this method
-        if (worstFitness > 0) {
+        if (worstFitness > 0)
+        {
             worstFitness = 0; // if there is no negative fitness values, just make this 0 and don't change anything.
         }
         cumulativeWheel[0] = genomes.get(0).fitness - worstFitness;
-        for (int i = 1; i < cumulativeWheel.length; i++) {
+        for (int i = 1; i < cumulativeWheel.length; i++)
+        {
             cumulativeWheel[i] = cumulativeWheel[i - 1] + Math.pow(genomes.get(i).fitness - worstFitness, Parameters.ROULETTE_MODIFIER);
         }
 
@@ -168,7 +169,8 @@ public class GeneticAlgorithm
 
         int index = Arrays.binarySearch(cumulativeWheel, randomNum);
 
-        if (index < 0) {
+        if (index < 0)
+        {
             index = Math.abs(index + 1);
         }
 
@@ -184,20 +186,24 @@ public class GeneticAlgorithm
         genomes.sort(comp);
     }
 
-    private void createMineSweepers()
+    private void createMineSweepers() throws IllegalParameterException
     {
 
         Random rand = new Random();
 
-        for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
+        for (int i = 0; i < Parameters.POPULATION_SIZE; i++)
+        {
             int x = rand.nextInt(Parameters.WIDTH) + Parameters.BORDER_PADDING;
             int y = rand.nextInt(Parameters.HEIGHT) + Parameters.BORDER_PADDING;
             int heading = rand.nextInt(360);
-            NeuralNet net = new NeuralNet(Parameters.NUM_INPUTS, Parameters.NUM_OUTPUTS,
-                    Parameters.NUM_HIDDEN_LAYERS, Parameters.NUM_NEURONS_PER_HIDDEN_LAYER, genomes.get(i).weights);
-            try {
+            NeuralNet net = new NeuralNet(Parameters.NUM_INPUTS,
+                    Parameters.NUM_LAYERS, Parameters.NUM_NEURONS_PER_LAYER, Parameters.ACTIVATION_TYPE_LIST,
+                    genomes.get(i).weights);
+            try
+            {
                 Controller.sweepers[i] = new MineSweeper(x, y, heading, net);
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 e.printStackTrace();
             }
         }
@@ -205,7 +211,8 @@ public class GeneticAlgorithm
 
     private void setGenomeFitnesses()
     {
-        for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
+        for (int i = 0; i < Parameters.POPULATION_SIZE; i++)
+        {
             genomes.get(i).fitness = Controller.sweepers[i].score;
         }
     }
@@ -214,23 +221,28 @@ public class GeneticAlgorithm
     {
         Controller.cFrame.dataset.addValue((Number) genomes.get(0).fitness, "Best Fitness", generations);
         double avgFitness = 0.0;
-        for (int i = 0; i < genomes.size(); i++) {
-            avgFitness += genomes.get(i).fitness;
+        for (Genome genome : genomes)
+        {
+            avgFitness += genome.fitness;
         }
         avgFitness /= genomes.size();
         Controller.cFrame.dataset.addValue((Number) avgFitness, "Average Fitness", generations);
         Controller.cFrame.dataset.addValue((Number) genomes.get(genomes.size() - 1).fitness, "Worst Fitness", generations);
 
-        if (genomes.get(0).fitness > fittestGenome.fitness && generations % 10 == 0) {
+        if (genomes.get(0).fitness > fittestGenome.fitness && generations % 10 == 0)
+        {
             List<String> lines = new ArrayList<String>();
             lines.add("" + generations + " " + genomes.get(0).weights);
-            try {
-                if (!Parameters.FITTEST_GENOMES_LOG.exists()) {
+            try
+            {
+                if (!Parameters.FITTEST_GENOMES_LOG.exists())
+                {
                     Parameters.FITTEST_GENOMES_LOG.getParentFile().mkdirs();
                     Parameters.FITTEST_GENOMES_LOG.createNewFile();
                 }
                 Files.write(Parameters.FITTEST_GENOMES_LOG.toPath(), lines, StandardCharsets.UTF_8);
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 e.printStackTrace();
             }
         }

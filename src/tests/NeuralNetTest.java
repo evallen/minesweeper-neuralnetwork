@@ -5,6 +5,8 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import neuralnetwork.IllegalParameterException;
+import neuralnetwork.Neuron;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,19 +44,28 @@ public class NeuralNetTest
     }
 
     @Test
-    public void testNeuralNetIntIntIntIntArrayListOfDouble()
+    public void testNeuralNetIntIntIntIntArrayListOfDouble() throws IllegalParameterException
     {
-        ArrayList<Integer> neuronsPerHiddenLayer = new ArrayList<Integer>()
+        ArrayList<Integer> neuronsPerLayer = new ArrayList<Integer>()
         {{
             add(2);
             add(2);
         }};
-        NeuralNet net = new NeuralNet(2, 2, 2, neuronsPerHiddenLayer, weights);
-        for (int i = 0; i < net.layers.size(); i++) {
+
+        ArrayList<Neuron.ActivationType> activationTypes = new ArrayList<>()
+        {{
+           add(Neuron.ActivationType.ACT_RELU);
+           add(Neuron.ActivationType.ACT_SIGMOID);
+        }};
+        NeuralNet net = new NeuralNet(2, 2, neuronsPerLayer, activationTypes, weights);
+        for (int i = 0; i < net.layers.size(); i++)
+        {
             System.out.println("Layer " + i);
-            for (int j = 0; j < net.layers.get(i).neurons.size(); j++) {
+            for (int j = 0; j < net.layers.get(i).neurons.size(); j++)
+            {
                 System.out.println("\tNeuron " + j);
-                for (int k = 0; k < net.layers.get(i).neurons.get(j).weights.size(); k++) {
+                for (int k = 0; k < net.layers.get(i).neurons.get(j).weights.size(); k++)
+                {
                     System.out.println("\t\t" + net.layers.get(i).neurons.get(j).weights.get(k));
                 }
             }

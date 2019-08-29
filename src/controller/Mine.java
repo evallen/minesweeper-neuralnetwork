@@ -13,13 +13,14 @@ public class Mine
 
     int x;
     int y;
-    final int sideLength = 5;
+    private final int sideLength = 5;
     private int scoreIndex;
 
     public Mine(int x, int y) throws IllegalArgumentException
     {
         if (x < Parameters.BORDER_PADDING || x >= Parameters.BORDER_PADDING + Parameters.WIDTH
-                || y < Parameters.BORDER_PADDING || y >= Parameters.BORDER_PADDING + Parameters.HEIGHT) {
+                || y < Parameters.BORDER_PADDING || y >= Parameters.BORDER_PADDING + Parameters.HEIGHT)
+        {
             throw new IllegalArgumentException("Initial coordinates of mine are out of bounds! ( " + x + ", " + y + ")");
         }
 
@@ -28,7 +29,7 @@ public class Mine
         this.scoreIndex = getRandomScoreIndex();
     }
 
-    public void paintMine(@NotNull Graphics g)
+    void paintMine(@NotNull Graphics g)
     {
         Graphics2D g2d = (Graphics2D) g.create();
 
@@ -41,17 +42,18 @@ public class Mine
         g2d.dispose();
     }
 
-    public Color getScoreColor()
+    private Color getScoreColor()
     {
         return Parameters.MINE_TYPES.get(scoreIndex).color;
 
     }
 
-    public int getRandomScoreIndex()
+    private int getRandomScoreIndex()
     {
         double[] cumulativeScoreProbs = new double[Parameters.MINE_TYPES.size()];
         cumulativeScoreProbs[0] = Parameters.MINE_TYPES.get(0).probability;
-        for (int i = 1; i < cumulativeScoreProbs.length; i++) {
+        for (int i = 1; i < cumulativeScoreProbs.length; i++)
+        {
             cumulativeScoreProbs[i] = cumulativeScoreProbs[i - 1] + Parameters.MINE_TYPES.get(i).probability;
         }
         Random rng = new Random();
@@ -60,22 +62,25 @@ public class Mine
 
         int index = Arrays.binarySearch(cumulativeScoreProbs, randomNum);
 
-        if (index < 0) {
+        if (index < 0)
+        {
             index = Math.abs(index + 1);
         }
 
         return index;
     }
 
-    public double getScore()
+    double getScore()
     {
         return Parameters.MINE_TYPES.get(scoreIndex).score;
     }
 
     public void setScore(double score)
     {
-        for (int i = 0; i < Parameters.MINE_TYPES.size(); i++) {
-            if (Parameters.MINE_TYPES.get(i).score == score) {
+        for (int i = 0; i < Parameters.MINE_TYPES.size(); i++)
+        {
+            if (Parameters.MINE_TYPES.get(i).score == score)
+            {
                 scoreIndex = i;
                 return;
             }

@@ -10,21 +10,24 @@ public class NeuronLayer
     int numInputsPerNeuron;
     public List<Neuron> neurons = new ArrayList<Neuron>();
 
-    public NeuronLayer(int numNeurons, int numInputsPerNeuron)
+    public NeuronLayer(int numNeurons, int numInputsPerNeuron, Neuron.ActivationType activationType)
     {
         this.numNeurons = numNeurons;
         this.numInputsPerNeuron = numInputsPerNeuron;
-        for (int i = 0; i < numNeurons; i++) {
-            neurons.add(new Neuron(numInputsPerNeuron));
+        for (int i = 0; i < numNeurons; i++)
+        {
+            neurons.add(new Neuron(numInputsPerNeuron, activationType));
         }
     }
 
-    public NeuronLayer(List<Double> weights, int numNeurons, int numInputsPerNeuron)
+    public NeuronLayer(List<Double> weights, int numNeurons, int numInputsPerNeuron, Neuron.ActivationType activationType)
     {
         this.numInputsPerNeuron = numInputsPerNeuron;
         this.numNeurons = numNeurons;
-        for (int i = 0; i < numNeurons; i++) {
-            neurons.add(new Neuron(weights.subList(numInputsPerNeuron * i, numInputsPerNeuron * (i + 1))));
+        for (int i = 0; i < numNeurons; i++)
+        {
+            neurons.add(new Neuron(weights.subList(numInputsPerNeuron * i, numInputsPerNeuron * (i + 1)),
+                    activationType));
         }
     }
 
@@ -34,7 +37,8 @@ public class NeuronLayer
             throw new IllegalArgumentException("Input list must match numInputs. (inputs.size() + 1 -> " + (inputs.size() + 1) + " and numInputsPerNeuron -> " + numInputsPerNeuron);
 
         List<Double> outputs = new ArrayList<Double>();
-        for (int i = 0; i < numNeurons; i++) {
+        for (int i = 0; i < numNeurons; i++)
+        {
             outputs.add(neurons.get(i).run(inputs));
         }
 

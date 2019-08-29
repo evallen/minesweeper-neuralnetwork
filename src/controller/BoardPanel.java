@@ -10,14 +10,10 @@ import javax.swing.JPanel;
 
 public class BoardPanel extends JPanel implements MouseListener
 {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 6388172060034471018L;
+    // Sometimes, we want to disable screen painting to speed up the simulation.
+    boolean painting = true;
 
-    public boolean painting = true;
-
-    public BoardPanel()
+    BoardPanel()
     {
         super();
         System.out.println("Board dimensions are: (" + Parameters.PANEL_PREFERRED_WIDTH + ", " + Parameters.PANEL_PREFERRED_HEIGHT + ")");
@@ -25,6 +21,7 @@ public class BoardPanel extends JPanel implements MouseListener
         this.setFocusable(true);
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return new Dimension(Parameters.PANEL_PREFERRED_WIDTH, Parameters.PANEL_PREFERRED_HEIGHT);
@@ -34,26 +31,34 @@ public class BoardPanel extends JPanel implements MouseListener
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
-        //g.drawString("Test.", 10, 10 + g.getFontMetrics().getAscent());
 
         // Draw border
         g.drawRect(Parameters.BORDER_PADDING, Parameters.BORDER_PADDING, Parameters.WIDTH, Parameters.HEIGHT);
 
         // Without the second condition, the first frame throws an exception because it tries to draw the
         // screen before the mines have been generated.
-        if (painting && Controller.mines[0] != null) {
-            for (Mine mine : Controller.mines) {
+        if (painting && Controller.mines[0] != null)
+        {
+            for (Mine mine : Controller.mines)
+            {
                 mine.paintMine(g);
             }
 
-            for (MineSweeper sweeper : Controller.sweepers) {
+            for (MineSweeper sweeper : Controller.sweepers)
+            {
                 sweeper.paintMineSweeper(g);
             }
         }
 
         Graphics2D g2d = (Graphics2D) g.create();
-        g2d.drawString("Generation: " + Controller.ga.generations, Parameters.BORDER_PADDING + 10, Parameters.BORDER_PADDING + 10 + g2d.getFontMetrics().getAscent());
-        g2d.drawString("Tick Multiplier: " + Controller.tickMultiplier + "x", Parameters.BORDER_PADDING + 10, Parameters.BORDER_PADDING + 10 + g2d.getFontMetrics().getAscent() + 2 + g2d.getFontMetrics().getAscent());
+        // Here we draw the text; we use g2d.getFontMetrics().getAscent to factor in the height of the text.
+        // In the second string of text, we simply add 2 pixels to the y-coordinate of the previous drawn string
+        // for spacing and then continue.
+        g2d.drawString("Generation: " + Controller.ga.generations, Parameters.BORDER_PADDING + 10,
+                    Parameters.BORDER_PADDING + 10 + g2d.getFontMetrics().getAscent());
+        g2d.drawString("Tick Multiplier: " + Parameters.TICK_MULTIPLIER + "x", Parameters.BORDER_PADDING + 10,
+                    Parameters.BORDER_PADDING + 10 + g2d.getFontMetrics().getAscent() + 2 +
+                        g2d.getFontMetrics().getAscent());
         g2d.dispose();
     }
 
@@ -61,21 +66,20 @@ public class BoardPanel extends JPanel implements MouseListener
     @Override
     public void mouseClicked(MouseEvent e)
     {
-        // TODO Auto-generated method stub
+        // Nothing
 
     }
 
     @Override
     public void mousePressed(MouseEvent e)
     {
-        // TODO Auto-generated method stub
+        // Nothing
 
     }
 
     @Override
     public void mouseReleased(MouseEvent e)
     {
-        //System.out.println("Click @ (" + e.getX() + ", " + e.getY() + ")");
         this.requestFocus();
 
     }
@@ -83,14 +87,14 @@ public class BoardPanel extends JPanel implements MouseListener
     @Override
     public void mouseEntered(MouseEvent e)
     {
-        // TODO Auto-generated method stub
+        // Nothing
 
     }
 
     @Override
     public void mouseExited(MouseEvent e)
     {
-        // TODO Auto-generated method stub
+        // Nothing
 
     }
 }

@@ -6,26 +6,28 @@ import java.util.List;
 public class NeuralNet
 {
 
-    public List<NeuronLayer> layers = new ArrayList<NeuronLayer>();
+    public List<NeuronLayer> layers = new ArrayList<>();
     private int numInputs;
-    private int numOutputs;
-    private int numHiddenLayers;
-    private List<Integer> numNeuronsPerHiddenLayer;
+    private int numLayers;
+    private List<Integer> numNeuronsPerLayer;
+    private List<Neuron.ActivationType> activationTypes;
 
     /**
      * Constructor for the main neural net.
      *
-     * @param numInputs                The number of inputs to the net.
-     * @param numOutputs               The number of outputs the net will produce.
-     * @param numHiddenLayers          The number of hidden layers in the net. This includes the output layer but does not include the input layer.
-     * @param numNeuronsPerHiddenLayer The number of neurons per each hidden layer.
+     * @param numInputs          The number of inputs to the net.
+     * @param numLayers          The number of layers in the net. This includes the output layer but does not include the input layer.
+     * @param numNeuronsPerLayer The number of neurons per each layer.
      */
-    public NeuralNet(int numInputs, int numOutputs, int numHiddenLayers, List<Integer> numNeuronsPerHiddenLayer)
+    public NeuralNet(int numInputs, int numLayers, List<Integer> numNeuronsPerLayer,
+                     List<Neuron.ActivationType> activationTypes) throws IllegalParameterException
     {
+        assert(activationTypes.size() == numLayers + 2); // Otherwise something is wrong.
         this.numInputs = numInputs;
-        this.numOutputs = numOutputs;
-        this.numHiddenLayers = numHiddenLayers;
-        this.numNeuronsPerHiddenLayer = numNeuronsPerHiddenLayer;
+        this.numLayers = numLayers;
+        this.numNeuronsPerLayer = numNeuronsPerLayer;
+        this.activationTypes = activationTypes;
+        validateActivationTypes();
 
         makeNet();
     }
@@ -33,38 +35,47 @@ public class NeuralNet
     /**
      * Constructor for the main neural net.
      *
-     * @param numInputs                The number of inputs to the net.
-     * @param numOutputs               The number of outputs the net will produce.
-     * @param numHiddenLayers          The number of hidden layers in the net. This includes the output layer but does not include the input layer.
-     * @param numNeuronsPerHiddenLayer The number of neurons per each hidden layer.
+     * @param numInputs          The number of inputs to the net.
+     * @param numLayers          The number of layers in the net. This includes the output layer but does not include the input layer.
+     * @param numNeuronsPerLayer The number of neurons per each layer.
+     * @param weights            The weights for the neural net.
      */
-    public NeuralNet(int numInputs, int numOutputs, int numHiddenLayers, List<Integer> numNeuronsPerHiddenLayer, List<Double> weights)
+    public NeuralNet(int numInputs, int numLayers, List<Integer> numNeuronsPerLayer,
+                     List<Neuron.ActivationType> activationTypes, List<Double> weights) throws IllegalParameterException
     {
+        assert(activationTypes.size() == numLayers + 2); // Otherwise something is wrong.
         this.numInputs = numInputs;
-        this.numOutputs = numOutputs;
-        this.numHiddenLayers = numHiddenLayers;
-        this.numNeuronsPerHiddenLayer = numNeuronsPerHiddenLayer;
+        this.numLayers = numLayers;
+        this.numNeuronsPerLayer = numNeuronsPerLayer;
+        this.activationTypes = activationTypes;
+        validateActivationTypes();
 
         makeNet(weights);
     }
 
     public void makeNet()
-    { // TODO Add logic for dedicated output layer (instead of using a final "hidden" one)
-        layers.add(new NeuronLayer(numNeuronsPerHiddenLayer.get(0), numInputs));
-        for (int i = 1; i < numHiddenLayers; i++) {
-            layers.add(new NeuronLayer(numNeuronsPerHiddenLayer.get(i), numNeuronsPerHiddenLayer.get(i - 1)));
+    {
+        layers.add(new NeuronLayer(numNeuronsPerLayer.get(0), numInputs, activationTypes.get(0)));
+        for (int i = 1; i < numLayers; i++)
+        {
+            layers.add(new NeuronLayer(numNeuronsPerLayer.get(i), numNeuronsPerLayer.get(i - 1),
+                    activationTypes.get(i)));
         }
     }
 
     public void makeNet(List<Double> weights)
     {
         int start = 0;
-        int end = numNeuronsPerHiddenLayer.get(0) * (numInputs + 1);
-        layers.add(new NeuronLayer(weights.subList(start, end), numNeuronsPerHiddenLayer.get(0), numInputs + 1));
-        for (int i = 1; i < numHiddenLayers; i++) {
+        int end = numNeuronsPerLayer.get(0) * (numInputs + 1);
+        layers.add(new NeuronLayer(weights.subList(start, end), numNeuronsPerLayer.get(0), numInputs + 1,
+                activationTypes.get(0)));
+        for (int i = 1; i < numLayers; i++)
+        {
             start = end;
-            end += numNeuronsPerHiddenLayer.get(i) * (numNeuronsPerHiddenLayer.get(i - 1) + 1);
-            layers.add(new NeuronLayer(weights.subList(start, end), numNeuronsPerHiddenLayer.get(i), numNeuronsPerHiddenLayer.get(i - 1) + 1));
+            end += numNeuronsPerLayer.get(i) * (numNeuronsPerLayer.get(i - 1) + 1); // Add one for bias
+            layers.add(new NeuronLayer(weights.subList(start, end), numNeuronsPerLayer.get(i),
+                    numNeuronsPerLayer.get(i - 1) + 1,
+                    activationTypes.get(i)));
         }
     }
 
@@ -73,7 +84,8 @@ public class NeuralNet
         if (inputs.size() != numInputs)
             throw new IllegalArgumentException("Input list must match numInputs. (inputs.size() -> " + inputs.size() + " and numInputs -> " + numInputs);
 
-        for (int i = 0; i < numHiddenLayers; i++) {
+        for (int i = 0; i < numLayers; i++)
+        {
             inputs = layers.get(i).run(inputs);
         }
 
@@ -87,7 +99,16 @@ public class NeuralNet
 
     public int getNumOutputs()
     {
-        return numOutputs;
+        return numNeuronsPerLayer.get(numLayers - 1);
+    }
+
+    private void validateActivationTypes() throws IllegalParameterException
+    {
+        for (int i = 0; i < activationTypes.size(); i++)
+        {
+            if (activationTypes.get(i) == Neuron.ActivationType.ACT_UNDEF)
+                throw new IllegalParameterException("Activation type for layer #" + i + " (zero-indexed) is invalid!");
+        }
     }
 
 }
