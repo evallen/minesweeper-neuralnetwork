@@ -18,12 +18,7 @@ public class GeneticAlgorithm
 
     public int generations = 0;
 
-    public double totalFitness;
-    public List<Double> bestFitnesses = new ArrayList<Double>();
-    public List<Double> worstFitnesses = new ArrayList<Double>();
-    public List<Double> avgFitnesses = new ArrayList<Double>();
-
-    private List<Genome> genomes = new ArrayList<Genome>();
+    private List<Genome> genomes = new ArrayList<>();
 
     public void start() throws IllegalParameterException
     {
@@ -41,20 +36,38 @@ public class GeneticAlgorithm
 
         for (int i = 0; i < Parameters.POPULATION_SIZE; i++)
         {
-            List<Double> randomWeights = new ArrayList<Double>();
+            List<Double> randomWeights = new ArrayList<>();
             for (int j = 0; j < Parameters.NUM_WEIGHTS_PER_GENOME; j++)
             {
-                randomWeights.add((rand.nextDouble() * 2) - 1);
+                randomWeights.add((rand.nextDouble() * 2) - 1); // Creates random weight in range [-1, 1]
             }
             genomes.add(new Genome(randomWeights));
         }
     }
 
+    /**
+     * Crosses two genomes, called `mom` and `dad`.
+     * First, we decide if we're even going to crossover based on Parameters.CROSSOVER_RATE.
+     * If we are, we then select a random spot in the genome and swap the weights after that point between
+     * genomes.
+     * Example (X = mom's weights; O = dad's weights):
+     *      Mom: XXXXXXXXXXXXXXX
+     *      Dad: OOOOOOOOOOOOOOO
+     *               ^ switchIndex
+     *      becomes
+     *
+     *      Mom: XXXXOOOOOOOOOOO
+     *      Dad: OOOOXXXXXXXXXXX
+     * @param mom The first genome to swap.
+     * @param dad The second genome to swap.
+     * @return An array of Genomes (the two "children") after the crossover operation (if it occurred).
+     */
     private Genome[] crossover(Genome mom, Genome dad)
     {
         Genome[] children = new Genome[2];
         Random rand = new Random();
 
+        // Decide if we are crossing over. If the weights are the same, there's no point, so just return now.
         if (rand.nextDouble() > Parameters.CROSSOVER_RATE || mom.weights == dad.weights)
         {
             children[0] = mom;
@@ -64,11 +77,11 @@ public class GeneticAlgorithm
 
         int switchIndex = rand.nextInt(mom.weights.size());
 
-        List<Double> newWeights0 = new ArrayList<Double>();
+        List<Double> newWeights0 = new ArrayList<>();
         newWeights0.addAll(mom.weights.subList(0, switchIndex));
         newWeights0.addAll(dad.weights.subList(switchIndex, dad.weights.size()));
 
-        List<Double> newWeights1 = new ArrayList<Double>();
+        List<Double> newWeights1 = new ArrayList<>();
         newWeights1.addAll(dad.weights.subList(0, switchIndex));
         newWeights1.addAll(mom.weights.subList(switchIndex, mom.weights.size()));
 
@@ -78,11 +91,15 @@ public class GeneticAlgorithm
         return children;
     }
 
+    /**
+     * Randomly "mutate" a genome - only occurs by random chance as specified by Parameters.MUTATION_RATE.
+     * @param genome The genome to undergo potential mutation.
+     */
     private void mutate(Genome genome)
     {
         Random rand = new Random();
 
-        List<Double> newWeights = new ArrayList<Double>();
+        List<Double> newWeights = new ArrayList<>();
         for (Double weight : genome.weights)
         {
             if (rand.nextDouble() < Parameters.MUTATION_RATE)
@@ -99,6 +116,11 @@ public class GeneticAlgorithm
         genome.weights = newWeights;
     }
 
+    /**
+     * Run an epoch of the simulation (i.e., one generation).
+     * @throws IllegalParameterException Occurs if an invalid parameter exist in the params.xml file for the
+     *                                   minesweepers.
+     */
     private void runEpoch() throws IllegalParameterException
     {
         // create MineSweepers
@@ -110,18 +132,12 @@ public class GeneticAlgorithm
 
         // sort by fitness
         sortGenomes();
-		/*for (int i = 0; i < genomes.size(); i++) {
-			for (Double dbl : genomes.get(i).weights) {
-				System.out.print(dbl + " ");
-			}
-			System.out.println();
-		}*/
 
         // find best fitness, worst fitness, and average fitness
         setBestWorstAvgStats();
 
         // elitism - we keep a few of the best genomes
-        List<Genome> newPop = new ArrayList<Genome>();
+        List<Genome> newPop = new ArrayList<>();
         for (int i = 0; i < Parameters.NUM_ELITISM && i < Parameters.POPULATION_SIZE; i++)
         {
             newPop.add(genomes.get(i));
@@ -130,7 +146,8 @@ public class GeneticAlgorithm
         // crossover
         while (newPop.size() < Parameters.POPULATION_SIZE)
         {
-            Genome[] newGenomes = crossover(genomes.get(selectGenomeRoulette(genomes)), genomes.get(selectGenomeRoulette(genomes)));
+            Genome[] newGenomes = crossover(genomes.get(selectGenomeRoulette(genomes)),
+                                            genomes.get(selectGenomeRoulette(genomes)));
 
             //mutate
             mutate(newGenomes[0]);
@@ -140,15 +157,21 @@ public class GeneticAlgorithm
             newPop.add(newGenomes[1]);
         }
 
-        // take out extra genome if one was added during crossover (since each crossover gives two but the population size or elitism size may have been odd)
-        if (newPop.size() == Parameters.POPULATION_SIZE)
+        // take out extra genome if one was added during crossover
+        // (since each crossover gives two but the population size or elitism size may have been odd)
+        if (newPop.size() == Parameters.POPULATION_SIZE + 1)
         {
-            //newPop.remove(newPop.size() - 1);
+            newPop.remove(newPop.size() - 1);
         }
 
         genomes = newPop;
     }
 
+    /**
+     * Select a random genome, but with more weight towards the ones with higher fitnesses.
+     * @param gList The list of genomes from which we are selecting one.
+     * @return The index of the selected genome.
+     */
     private int selectGenomeRoulette(List<Genome> gList)
     {
         // genomes list must be sorted by this point!
@@ -179,10 +202,7 @@ public class GeneticAlgorithm
 
     private void sortGenomes()
     {
-        Comparator<Genome> comp = (Genome a, Genome b) ->
-        {
-            return b.compareTo(a);
-        };
+        Comparator<Genome> comp = (Genome a, Genome b) -> b.compareTo(a);
         genomes.sort(comp);
     }
 
@@ -209,6 +229,9 @@ public class GeneticAlgorithm
         }
     }
 
+    /**
+     * Set the fitnesses of genome to the score of the minesweeper with that genome.
+     */
     private void setGenomeFitnesses()
     {
         for (int i = 0; i < Parameters.POPULATION_SIZE; i++)
@@ -216,6 +239,7 @@ public class GeneticAlgorithm
             genomes.get(i).fitness = Controller.sweepers[i].score;
         }
     }
+
 
     private void setBestWorstAvgStats()
     {
@@ -231,7 +255,7 @@ public class GeneticAlgorithm
 
         if (genomes.get(0).fitness > fittestGenome.fitness && generations % 10 == 0)
         {
-            List<String> lines = new ArrayList<String>();
+            List<String> lines = new ArrayList<>();
             lines.add("" + generations + " " + genomes.get(0).weights);
             try
             {

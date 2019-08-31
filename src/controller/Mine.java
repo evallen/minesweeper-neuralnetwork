@@ -48,6 +48,14 @@ public class Mine
 
     }
 
+    /**
+     * This method outputs a random index, representing a MineType.
+     * This works because the MineTypes are stored in a List (Parameters.MINE_TYPES).
+     * The output of this function can then be used to retrieve further data about that MineType (for example,
+     * if this function sets the Mine's scoreIndex as 0, the Mine's MineType will be set to the first MineType
+     * in the list.
+     * @return The index of this Mine's MineType in the Parameters.MINE_TYPES list.
+     */
     private int getRandomScoreIndex()
     {
         double[] cumulativeScoreProbs = new double[Parameters.MINE_TYPES.size()];
@@ -73,19 +81,5 @@ public class Mine
     double getScore()
     {
         return Parameters.MINE_TYPES.get(scoreIndex).score;
-    }
-
-    public void setScore(double score)
-    {
-        for (int i = 0; i < Parameters.MINE_TYPES.size(); i++)
-        {
-            if (Parameters.MINE_TYPES.get(i).score == score)
-            {
-                scoreIndex = i;
-                return;
-            }
-        }
-
-        throw new IllegalArgumentException("Couldn't set mine's score - not in Parameters.MINE_SCORE_INFO!");
     }
 }

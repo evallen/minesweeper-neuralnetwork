@@ -6,21 +6,11 @@ import java.util.List;
 public class NeuronLayer
 {
 
-    int numNeurons;
-    int numInputsPerNeuron;
-    public List<Neuron> neurons = new ArrayList<Neuron>();
+    private int numNeurons;
+    private int numInputsPerNeuron;
+    public List<Neuron> neurons = new ArrayList<>();
 
-    public NeuronLayer(int numNeurons, int numInputsPerNeuron, Neuron.ActivationType activationType)
-    {
-        this.numNeurons = numNeurons;
-        this.numInputsPerNeuron = numInputsPerNeuron;
-        for (int i = 0; i < numNeurons; i++)
-        {
-            neurons.add(new Neuron(numInputsPerNeuron, activationType));
-        }
-    }
-
-    public NeuronLayer(List<Double> weights, int numNeurons, int numInputsPerNeuron, Neuron.ActivationType activationType)
+    NeuronLayer(List<Double> weights, int numNeurons, int numInputsPerNeuron, Neuron.ActivationType activationType)
     {
         this.numInputsPerNeuron = numInputsPerNeuron;
         this.numNeurons = numNeurons;
@@ -31,12 +21,12 @@ public class NeuronLayer
         }
     }
 
-    public List<Double> run(List<Double> inputs)
+    List<Double> run(List<Double> inputs)
     {
         if (inputs.size() + 1 != numInputsPerNeuron)
             throw new IllegalArgumentException("Input list must match numInputs. (inputs.size() + 1 -> " + (inputs.size() + 1) + " and numInputsPerNeuron -> " + numInputsPerNeuron);
 
-        List<Double> outputs = new ArrayList<Double>();
+        List<Double> outputs = new ArrayList<>();
         for (int i = 0; i < numNeurons; i++)
         {
             outputs.add(neurons.get(i).run(inputs));

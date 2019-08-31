@@ -29,7 +29,6 @@ public class Controller
 
     private static BoardPanel panel;
 
-    private static int totalTicks = 0;
     private static int epochTicks = 0;
 
     public static ChartFrame cFrame;
@@ -48,13 +47,36 @@ public class Controller
 
         JFrame frame = new JFrame("Mine Sweeper Neural Network");
         panel = new BoardPanel();
+        setUpPanelInputs();
 
+        BorderLayout layout = new BorderLayout();
+        frame.getContentPane().setLayout(layout);
+        frame.getContentPane().add(panel, BorderLayout.CENTER);
+        frame.pack();
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        frame.setFocusable(true);
+        frame.setVisible(true);
+
+        panel.requestFocus();
+
+        ga.start();
+    }
+
+    /**
+     * Sets the behavior for each key when focused on the main panel.
+     */
+    private static void setUpPanelInputs()
+    {
         panel.addMouseListener(panel);
         panel.getInputMap().put(KeyStroke.getKeyStroke('j'), "slow");
         panel.getInputMap().put(KeyStroke.getKeyStroke('k'), "fast");
         panel.getInputMap().put(KeyStroke.getKeyStroke('n'), "smallSlow");
         panel.getInputMap().put(KeyStroke.getKeyStroke('m'), "smallFast");
         panel.getInputMap().put(KeyStroke.getKeyStroke('f'), "paintToggle");
+        // ^^ Sometimes we want to disable painting so the simulation goes faster.
+
         panel.getActionMap().put("slow", new AbstractAction()
         {
 
@@ -131,23 +153,6 @@ public class Controller
                 panel.painting = !panel.painting;
             }
         });
-        BorderLayout layout = new BorderLayout();
-
-        frame.getContentPane().setLayout(layout);
-        frame.getContentPane().add(panel, BorderLayout.CENTER);
-        frame.pack();
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setSize(WIDTH, HEIGHT);
-
-        frame.setFocusable(true);
-
-        frame.setVisible(true);
-
-        panel.requestFocus();
-
-        ga.start();
-
     }
 
     public static void startLoop()
@@ -176,7 +181,6 @@ public class Controller
 
             lastUpdateTime = System.currentTimeMillis();
             tick();
-            totalTicks++;
             epochTicks++;
 
             if (epochTicks >= Parameters.GENERATION_TIME)
@@ -186,6 +190,10 @@ public class Controller
         }
     }
 
+    /**
+     * Update the state of all the sweepers and check if they've hit a mine; the smallest moment of time possible
+     * in the simulation. Also, repaint the board if we have it turned on.
+     */
     private static void tick()
     {
         for (MineSweeper sweeper : sweepers)
@@ -197,16 +205,6 @@ public class Controller
         {
             panel.repaint();
         }
-    }
-
-    public static double getDeltaTimeSec()
-    {
-        return (deltaTime * Parameters.TICK_MULTIPLIER) / 1000;
-    }
-
-    public static double getDeltaTimeMs()
-    {
-        return deltaTime * Parameters.TICK_MULTIPLIER;
     }
 
     /**
@@ -245,11 +243,24 @@ public class Controller
         }
     }
 
+    /**
+     * Helper function to calculate Euclidean distance between two points, (x1, y1) and (x2, y2).
+     * @param x1 The x-coordinate of the first point.
+     * @param y1 The y-coordinate of the first point.
+     * @param x2 The x-coordinate of the second point.
+     * @param y2 The y-coordinate of the second point.
+     * @return The Euclidean distance between the two points.
+     */
     static double getDistance(double x1, double y1, double x2, double y2)
     {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
+    /**
+     * Randomly place the mines on the board.
+     * @param rand The random generator used to create the mines. Can be controlled with the same seed for
+     *             deterministic behavior.
+     */
     private static void clearAndCreateMines(Random rand)
     {
         for (int i = 0; i < mines.length; i++)

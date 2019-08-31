@@ -18,26 +18,6 @@ public class NeuralNet
      * @param numInputs          The number of inputs to the net.
      * @param numLayers          The number of layers in the net. This includes the output layer but does not include the input layer.
      * @param numNeuronsPerLayer The number of neurons per each layer.
-     */
-    public NeuralNet(int numInputs, int numLayers, List<Integer> numNeuronsPerLayer,
-                     List<Neuron.ActivationType> activationTypes) throws IllegalParameterException
-    {
-        assert(activationTypes.size() == numLayers + 2); // Otherwise something is wrong.
-        this.numInputs = numInputs;
-        this.numLayers = numLayers;
-        this.numNeuronsPerLayer = numNeuronsPerLayer;
-        this.activationTypes = activationTypes;
-        validateActivationTypes();
-
-        makeNet();
-    }
-
-    /**
-     * Constructor for the main neural net.
-     *
-     * @param numInputs          The number of inputs to the net.
-     * @param numLayers          The number of layers in the net. This includes the output layer but does not include the input layer.
-     * @param numNeuronsPerLayer The number of neurons per each layer.
      * @param weights            The weights for the neural net.
      */
     public NeuralNet(int numInputs, int numLayers, List<Integer> numNeuronsPerLayer,
@@ -53,17 +33,7 @@ public class NeuralNet
         makeNet(weights);
     }
 
-    public void makeNet()
-    {
-        layers.add(new NeuronLayer(numNeuronsPerLayer.get(0), numInputs, activationTypes.get(0)));
-        for (int i = 1; i < numLayers; i++)
-        {
-            layers.add(new NeuronLayer(numNeuronsPerLayer.get(i), numNeuronsPerLayer.get(i - 1),
-                    activationTypes.get(i)));
-        }
-    }
-
-    public void makeNet(List<Double> weights)
+    private void makeNet(List<Double> weights)
     {
         int start = 0;
         int end = numNeuronsPerLayer.get(0) * (numInputs + 1);
@@ -90,16 +60,6 @@ public class NeuralNet
         }
 
         return inputs;
-    }
-
-    public int getNumInputs()
-    {
-        return numInputs;
-    }
-
-    public int getNumOutputs()
-    {
-        return numNeuronsPerLayer.get(numLayers - 1);
     }
 
     private void validateActivationTypes() throws IllegalParameterException

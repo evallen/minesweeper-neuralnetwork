@@ -13,8 +13,6 @@ public class MineSweeper
 
     double x, y;
     private double heading;
-    double nearestMine;
-    int debugPaints = 0;
     public int score = 0;
     static double collectDistance = 5;
 
@@ -22,8 +20,9 @@ public class MineSweeper
 
     public MineSweeper(double x, double y, double heading, NeuralNet net) throws Exception
     {
-        if (x < Parameters.BORDER_PADDING || x >= Parameters.BORDER_PADDING + Parameters.WIDTH
-                || y < Parameters.BORDER_PADDING || y >= Parameters.BORDER_PADDING + Parameters.HEIGHT)
+        // Make sure the passed coordinates are in bounds.
+        if (x < Parameters.BORDER_PADDING || x >= Parameters.BORDER_PADDING + Parameters.WIDTH ||
+            y < Parameters.BORDER_PADDING || y >= Parameters.BORDER_PADDING + Parameters.HEIGHT)
         {
             throw new Exception("Initial coordinates of minesweeper are out of bounds! (" + x +
                                 ", " + y + "); (" + Parameters.BORDER_PADDING + "-" +
@@ -35,7 +34,6 @@ public class MineSweeper
         this.y = y;
         this.heading = heading;
         this.net = net;
-
     }
 
     void paintMineSweeper(Graphics g)
@@ -47,7 +45,9 @@ public class MineSweeper
         g2d.translate(x, y);
         g2d.rotate(Math.toRadians(-heading));
 
-        // Internal parameters for drawing the minesweeperS
+        // Internal parameters for drawing the minesweepers.
+        // Each value here (x1, x2, x3, x4, y1, y2, y3) is used to define points on the minesweeper,
+        // allowing us to draw it.
         int x1 = -(Parameters.BODY_WIDTH / 2) - Parameters.WHEEL_WIDTH;
         int x2 = -(Parameters.BODY_WIDTH / 2);
         int x3 = (Parameters.BODY_WIDTH / 2);
@@ -78,6 +78,9 @@ public class MineSweeper
         g2d.dispose();
     }
 
+    /**
+     * During each tick, this function is called to update _this individual minesweeper_.
+     */
     void doTurn()
     {
         // Get inputs
@@ -117,9 +120,9 @@ public class MineSweeper
 
     /**
      * Takes an input `value` and, if it's out of the range [`min`, `max`], sets it to the closest extreme.
-     * @param value
-     * @param min
-     * @param max
+     * @param value The value to be clamped.
+     * @param min The lowest value in the clamp range.
+     * @param max The highest value in the clamp range.
      * @return The clamped value.
      */
     private double clamp(double value, double min, double max)
@@ -132,9 +135,9 @@ public class MineSweeper
      * [`min`, `max`] - except now, if `value` is out of range in one direction, the function returns the _opposite_
      * extreme. Example: `clamp(4.0, 1.0, 2.0) == 1.0`. This is useful so the minesweepers can drive off one end of
      * the board and come back on the other side.
-     * @param value
-     * @param min
-     * @param max
+     * @param value The value to be wrap-clamped.
+     * @param min The lowest value in the wrap-clamp range (if value > max, then value = min).
+     * @param max The highest value in the wrap-clamp range (if value < min, then value = max).
      * @return The clamped value, wrapped to the other side of the [`min`, `max`] range.
      */
     private double clampWrap(double value, double min, double max)
@@ -162,14 +165,6 @@ public class MineSweeper
     void epochEnd()
     {
         // nothing right now
-    }
-
-    /**
-     * Use when you want to bring the counter back to zero.
-     */
-    public void resetMineCounter()
-    {
-        score = 0;
     }
 
     private Mine[] getClosestMines()

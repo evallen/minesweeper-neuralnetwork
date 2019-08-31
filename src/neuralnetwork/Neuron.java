@@ -7,21 +7,21 @@ import java.util.Random;
 public class Neuron
 {
 
-    int numInputs;
-    public List<Double> weights = new ArrayList<Double>(); // First weight is bias
+    private int numInputs;
+    public List<Double> weights = new ArrayList<>(); // First weight is bias
 
     public enum ActivationType
     {
         ACT_SIGMOID,
         ACT_RELU,
         ACT_UNDEF
-    };
+    }
 
-    public ActivationType activationType;
+    private ActivationType activationType;
 
-    static final double sigmoidModifier = 1; // Usually stays one, can change shape of sigmoid
+    private static final double sigmoidModifier = 1; // Usually stays one, can change shape of sigmoid
 
-    public Neuron(int numInputs, ActivationType actType)
+    Neuron(int numInputs, ActivationType actType)
     {
         this.numInputs = numInputs;
         // Makes one extra weight for bias
@@ -33,7 +33,7 @@ public class Neuron
         this.activationType = actType;
     }
 
-    public Neuron(List<Double> weights, ActivationType actType)
+    Neuron(List<Double> weights, ActivationType actType)
     {
         this.numInputs = weights.size();
         this.weights = weights;
@@ -46,7 +46,7 @@ public class Neuron
         return rand.nextDouble() * 2 - 1;
     }
 
-    public double run(List<Double> inputs)
+    double run(List<Double> inputs)
     {
         if (inputs.size() + 1 != numInputs)
             throw new IllegalArgumentException("Input list must match numInputs. (inputs.size() + 1 -> " + (inputs.size() + 1) + " and numInputs -> " + numInputs);
@@ -56,9 +56,9 @@ public class Neuron
 
     /**
      * The neuron's activation function.
-     * @param weightedSum
-     * @param activationType
-     * @return
+     * @param weightedSum The weighted sum of all of the neuron's inputs (for each input, add (input * weight)).
+     * @param activationType What kind of activation function the neuron uses.
+     * @return The output of the neuron.
      */
     private double activationFunction(double weightedSum, ActivationType activationType)
     {

@@ -15,10 +15,10 @@ import neuralnetwork.NeuralNet;
 public class NeuralNetTest
 {
 
-    List<Double> weights = new ArrayList<Double>();
+    private List<Double> weights = new ArrayList<>();
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         weights.add(0.0);
         weights.add(-.3);
@@ -46,7 +46,7 @@ public class NeuralNetTest
     @Test
     public void testNeuralNetIntIntIntIntArrayListOfDouble() throws IllegalParameterException
     {
-        ArrayList<Integer> neuronsPerLayer = new ArrayList<Integer>()
+        ArrayList<Integer> neuronsPerLayer = new ArrayList<>()
         {{
             add(2);
             add(2);
@@ -71,7 +71,7 @@ public class NeuralNetTest
             }
         }
 
-        List<Double> inputs = new ArrayList<Double>();
+        List<Double> inputs = new ArrayList<>();
         inputs.add(3.2);
         inputs.add(2.4);
         System.out.println(net.run(inputs));
