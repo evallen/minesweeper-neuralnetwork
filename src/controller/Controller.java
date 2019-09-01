@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 public class Controller
 {
 
-    private static File XMLFile = new File("src\\controller\\params.xml");
+    private static File XMLFile = new File("params.xml");
     static GeneticAlgorithm ga = new GeneticAlgorithm();
 
     public static MineSweeper[] sweepers;

@@ -70,7 +70,7 @@ public class Parameters
     // Mine stuff
     public static List<MineType> MINE_TYPES;
 
-    public static void initializeParameters(File XMLFile) throws ParserConfigurationException, SAXException, IOException
+    public static void initializeParameters(File XMLFile) throws ParserConfigurationException, SAXException
     {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser parser = factory.newSAXParser();
@@ -202,6 +202,19 @@ public class Parameters
             }
         };
 
-        parser.parse(XMLFile, handler);
+        try
+        {
+            parser.parse(XMLFile, handler);
+        } catch (IOException e)
+        {
+            System.out.println();
+            System.out.println("#####################################################################################");
+            System.out.println("ERROR: Params.xml file must be present in the directory of the JARfile.");
+            System.out.println("For a sample params.xml file, please see https://github.com/Bungee54/minesweeper-neuralnetwork/");
+            System.out.println("#####################################################################################");
+            System.out.println();
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

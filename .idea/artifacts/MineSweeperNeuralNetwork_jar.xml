@@ -1,0 +1,16 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="MineSweeperNeuralNetwork:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/MineSweeperNeuralNetwork_jar</output-path>
+    <root id="archive" name="MineSweeperNeuralNetwork.jar">
+      <element id="module-output" name="MineSweeperNeuralNetwork" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/orsonpdf-1.6-eval.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/hamcrest-core-1.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jfreechart-fse-master.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/lib/junit-4.12.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/junit-4.11.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jfreesvg-1.9.jar" path-in-jar="/" />
+      <element id="file-copy" path="$PROJECT_DIR$/params.xml" />
+    </root>
+  </artifact>
+</component>
