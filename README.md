@@ -1,4 +1,4 @@
-# minesweeper-neuralnetwork
+# MineSweeper Neural Network
 
 ![](animation.gif)
 
